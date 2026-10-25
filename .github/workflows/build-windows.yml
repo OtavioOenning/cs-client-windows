@@ -20,10 +20,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-          cache: "npm"
+          # NOTE: no cache: "npm" here on purpose. That option needs a
+          # package-lock.json already committed to key the cache off of, and
+          # this repo doesn't have one (it was generated without network
+          # access, so `npm install` was never run to create it). Once a
+          # lock file exists and is committed, "cache: npm" can be re-added
+          # to speed up subsequent runs.
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Type-check
         run: npm run typecheck
@@ -40,10 +45,6 @@ jobs:
       - name: List build output
         run: Get-ChildItem -Recurse release | Select-Object FullName
 
-      # Smoke test: launch the packaged, unpacked app headlessly and confirm
-      # the main process starts without throwing, then kill it. This is not
-      # a full UI test, but it does catch "the app crashes on launch"
-      # mistakes that a plan/typecheck alone would miss.
       - name: Smoke test packaged app
         shell: pwsh
         run: |
