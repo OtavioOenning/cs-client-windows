@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  ::selection {
+    background-color: theme("colors.accent.DEFAULT");
+    color: theme("colors.surface.0");
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.accent.DEFAULT");
+    outline-offset: 2px;
+  }
+
+  /* Only the custom title bar region should be draggable; everything else
+     (buttons, inputs) explicitly opts back out via -webkit-app-region: no-drag
+     where needed. */
+  .app-drag-region {
+    -webkit-app-region: drag;
+  }
+  .app-no-drag {
+    -webkit-app-region: no-drag;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-surface-1 border border-surface-border rounded-xl2 shadow-panel;
+  }
+  .btn-primary {
+    @apply bg-accent text-surface-0 font-medium rounded-lg px-4 py-2 transition-colors hover:bg-accent-dim disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-surface-2 text-zinc-100 font-medium rounded-lg px-4 py-2 border border-surface-border transition-colors hover:bg-surface-3 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+}

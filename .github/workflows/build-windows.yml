@@ -1,0 +1,67 @@
+name: Build Windows installer
+
+# This workflow exists because the environment that generated this project
+# has no network access and is not Windows, so it cannot run `npm install`
+# or `electron-builder --win` itself (both need the internet; the latter
+# also needs Windows or Wine). A GitHub Actions "windows-latest" runner has
+# both, so this is where the installer is actually built and smoke-tested.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build renderer + main/preload
+        run: npm run build
+
+      - name: Build Windows installer (NSIS) + portable exe
+        run: npm run build:win
+
+      - name: List build output
+        run: Get-ChildItem -Recurse release | Select-Object FullName
+
+      # Smoke test: launch the packaged, unpacked app headlessly and confirm
+      # the main process starts without throwing, then kill it. This is not
+      # a full UI test, but it does catch "the app crashes on launch"
+      # mistakes that a plan/typecheck alone would miss.
+      - name: Smoke test packaged app
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path "release\win-unpacked" -Filter "*.exe" | Select-Object -First 1
+          if (-not $exe) { throw "No unpacked .exe found under release\win-unpacked" }
+          Write-Host "Launching $($exe.FullName) for a 5-second smoke test..."
+          $proc = Start-Process -FilePath $exe.FullName -PassThru
+          Start-Sleep -Seconds 5
+          if ($proc.HasExited) {
+            throw "App exited on its own within 5 seconds (exit code $($proc.ExitCode)) — likely crashed on launch."
+          }
+          Stop-Process -Id $proc.Id -Force
+          Write-Host "Smoke test passed: app was still running after 5 seconds."
+
+      - name: Upload installer + portable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: cs-companion-windows-installer
+          path: |
+            release/*.exe
+          if-no-files-found: error

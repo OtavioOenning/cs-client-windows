@@ -1,0 +1,30 @@
+appId: com.example.cscompanion
+productName: CS Companion
+copyright: "Copyright (c) 2026"
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**/*
+  - package.json
+asarUnpack:
+  - "**/*.node"
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: build/icon.ico
+  # Code signing is NOT configured. Supply your own certificate and set:
+  #   certificateFile / certificateSubjectName / certificatePassword (via env var)
+  # or signingHashAlgorithms, before shipping a signed build.
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  artifactName: "${productName}-Setup-${version}.${ext}"
+portable:
+  artifactName: "${productName}-Portable-${version}.${ext}"
+publish: null

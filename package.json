@@ -1,0 +1,49 @@
+{
+  "name": "cs-companion-windows",
+  "productName": "CS Companion",
+  "version": "0.1.0",
+  "description": "Independently implemented Windows desktop companion for Counter-Strike 2: legitimate performance tweaks, PRO config builder, and esports resource shell.",
+  "author": "Your Name <you@example.com>",
+  "license": "MIT",
+  "private": true,
+  "main": "dist/main/index.js",
+  "engines": {
+    "node": ">=20.11.0 <21",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"npm:dev:electron\"",
+    "dev:electron": "tsc -p tsconfig.electron.json && electron . --dev",
+    "build:renderer": "tsc -p tsconfig.json && vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build": "npm run build:renderer && npm run build:electron",
+    "build:win": "npm run build && electron-builder --win --x64",
+    "build:win:portable": "npm run build && electron-builder --win portable --x64",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@typescript-eslint/eslint-plugin": "7.16.0",
+    "@typescript-eslint/parser": "7.16.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "autoprefixer": "10.4.19",
+    "concurrently": "8.2.2",
+    "electron": "31.2.1",
+    "electron-builder": "24.13.3",
+    "eslint": "8.57.0",
+    "postcss": "8.4.39",
+    "tailwindcss": "3.4.4",
+    "typescript": "5.5.3",
+    "vite": "5.3.3",
+    "vitest": "2.0.3"
+  }
+}
